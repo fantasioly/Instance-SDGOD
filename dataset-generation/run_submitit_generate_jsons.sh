@@ -1,0 +1,14 @@
+python generate.py \
+    --config /cpfs/user/haoli84/code/InstanceDiffusion/Grounded-Segment-Anything/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py \
+    --ram_checkpoint /cpfs/user/haoli84/code/InstanceDiffusion/pretrained/ram_swin_large_14m.pth \
+    --grounded_checkpoint /cpfs/user/haoli84/code/InstanceDiffusion/pretrained/groundingdino_swint_ogc.pth \
+    --sam_checkpoint /cpfs/user/haoli84/code/InstanceDiffusion/pretrained/sam_vit_h_4b8939.pth \
+    --box_threshold 0.25 \
+    --text_threshold 0.2 \
+    --iou_threshold 0.5 \
+    --device "cuda" \
+    --sam_hq_checkpoint /cpfs/user/haoli84/code/InstanceDiffusion/pretrained/sam_hq_vit_h.pth \
+    --use_sam_hq \
+    --output_dir "/cpfs/user/haoli84/code/InstanceDiffusion/sample-data-gen/" \
+    --train_data_path sample_data_gen.json \
+    --output_dir "outputs" \

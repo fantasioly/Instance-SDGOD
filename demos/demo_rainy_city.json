@@ -1,0 +1,35 @@
+{
+    "caption": "A rainy city street with cars, buses, and pedestrians under overcast sky",
+    "width": 512,
+    "height": 512,
+    "annos": [
+        {
+            "bbox": [30, 200, 220, 160],
+            "caption": "a large red city bus stopped at the bus stop in the rain",
+            "category_name": "bus",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [280, 230, 180, 120],
+            "caption": "a silver car splashing through a puddle on the wet road",
+            "category_name": "car",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [100, 380, 50, 100],
+            "caption": "a person in a yellow raincoat holding an umbrella",
+            "category_name": "person",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [400, 350, 45, 90],
+            "caption": "a cyclist on a bicycle wearing a helmet and rain gear",
+            "category_name": "bicycle",
+            "mask": [],
+            "point": []
+        }
+    ]
+}

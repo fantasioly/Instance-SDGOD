@@ -1,0 +1,42 @@
+{
+    "caption": "A busy urban street scene with multiple cars, pedestrians, and traffic lights on a sunny day",
+    "width": 512,
+    "height": 512,
+    "annos": [
+        {
+            "bbox": [50, 200, 150, 120],
+            "caption": "a blue sedan car driving on the road",
+            "category_name": "car",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [220, 180, 180, 140],
+            "caption": "a red SUV parked on the street",
+            "category_name": "car",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [420, 280, 60, 150],
+            "caption": "a person wearing a white shirt walking on the sidewalk",
+            "category_name": "person",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [180, 50, 40, 100],
+            "caption": "a green traffic light hanging from a pole",
+            "category_name": "traffic light",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [300, 350, 100, 80],
+            "caption": "a brown dog standing on the sidewalk",
+            "category_name": "dog",
+            "mask": [],
+            "point": []
+        }
+    ]
+}

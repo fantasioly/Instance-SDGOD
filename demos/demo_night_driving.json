@@ -1,0 +1,35 @@
+{
+    "caption": "A nighttime urban driving scene with cars on a wet road under street lights",
+    "width": 512,
+    "height": 512,
+    "annos": [
+        {
+            "bbox": [100, 250, 200, 130],
+            "caption": "a white taxi cab with headlights on driving at night",
+            "category_name": "car",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [350, 220, 140, 110],
+            "caption": "a black car with red taillights visible in the dark",
+            "category_name": "car",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [250, 80, 50, 80],
+            "caption": "a bright yellow street light illuminating the road",
+            "category_name": "street light",
+            "mask": [],
+            "point": []
+        },
+        {
+            "bbox": [50, 300, 70, 140],
+            "caption": "a person with an umbrella walking on the sidewalk",
+            "category_name": "person",
+            "mask": [],
+            "point": []
+        }
+    ]
+}
