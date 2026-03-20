@@ -345,52 +345,52 @@ def get_args_parser():
 
     return parser
 
-#函数。读取coco数据集的json格式标签文件
+# Function: Read COCO format JSON annotation file
 def read_coco_json(json_path):
     with open(json_path, 'r') as f:
         data = json.load(f)
     return data
 
 def create_image_to_id_dict(json_path):
-    # 加载COCO数据集的JSON文件
+    # Load COCO dataset JSON file
     with open(json_path, 'r') as f:
         coco_data = json.load(f)
 
-    # 初始化字典，键是图片文件名，值是图片ID
+    # Initialize dictionary: key is image filename, value is image ID
     image_id_dict = {}
 
-    # 遍历JSON文件中的images，查找与给定目录中的图片匹配的图片
+    # Iterate through images in JSON file to find matching images
     for image in coco_data['images']:
         file_name = image['file_name']
         image_id = image['id']
 
-        # 获取图片文件名（不包含路径）
+        # Get image filename (without path)
         image_key = os.path.splitext(os.path.basename(file_name))[0]
 
-        # 将图片文件名和ID添加到字典
+        # Add image filename and ID to dictionary
         image_id_dict[image_key] = image_id
 
     return image_id_dict
 
 def create_id_to_category_dict(json_path):
-    # 加载COCO数据集的JSON文件
+    # Load COCO dataset JSON file
     with open(json_path, 'r') as f:
         coco_data = json.load(f)
 
-    # 初始化字典，键是图片文件名，值是图片ID
+    # Initialize dictionary: key is image filename, value is image ID
     image_id_dict = {}
 
-    # 遍历JSON文件中的images，查找与给定目录中的图片匹配的图片
+    # Iterate through images in JSON file to find matching images
     for categories in coco_data['categories']:
         name = categories['name']
         id = categories['id']
 
-        # 将图片文件名和ID添加到字典
+        # Add image filename and ID to dictionary
         image_id_dict[id] = name
 
     return image_id_dict
 
-## 函数。根据json标注返回image_id_to_annotations
+## Function: Return image_id_to_annotations mapping from JSON annotations
 def get_image_id_to_annotations(json_path):
     data = read_coco_json(json_path)
     images = data['images']
@@ -516,7 +516,7 @@ def main(args):
                 continue
             img_id = image_to_id_dict[os.path.splitext(os.path.basename(image_path))[0]]
             # coco_annotations = read_coco_json(args.annotation_path)
-            #根据文件路径获得对应图片id
+            # Get corresponding image ID from file path
             if img_id not in image_id_to_annotations:
                 continue
             # if img_id < 450:
@@ -531,7 +531,7 @@ def main(args):
                 boxes_filt.append([annotation['bbox'][0], annotation['bbox'][1], annotation['bbox'][0]+annotation['bbox'][2], annotation['bbox'][1]+annotation['bbox'][3]])
                 scores.append(1.0)
                 pred_phrases.append(id_to_category_dict[annotation['category_id']] + '(1)')
-                #如果arg.train_data_path参数包含字符cityscapes
+                # If args.train_data_path contains 'cityscapes'
                 if 'cityscapes' in args.train_data_path and 'segmentation' in annotation:
                     rle_mask = annotation['segmentation']
                     pixel_mask = coco_mask.decode(rle_mask)

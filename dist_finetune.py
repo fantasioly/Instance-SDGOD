@@ -59,11 +59,11 @@ def get_args_parser():
 
 def main(args):
     # fix seed
-    # 每个进程根据自己的local_rank设置应该使用的GPU
+    # Each process sets the GPU to use based on its local_rank
     # torch.cuda.set_device(args.local_rank)
     # device = torch.device('cuda', args.local_rank)
 
-    # 初始化分布式环境，主要用来帮助进程间通信
+    # Initialize distributed environment, mainly for inter-process communication
     torch.distributed.init_process_group(backend='nccl')
 
     config = OmegaConf.load(args.yaml_file)
@@ -77,7 +77,7 @@ def main(args):
 
     # create output dir
     Path(args.OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
-    # 只 master 进程做 logging，否则输出会很乱
+    # Only master process does logging, otherwise output will be messy
     if args.local_rank == 0:
         tb_writer = SummaryWriter(comment='ddp-training')
 

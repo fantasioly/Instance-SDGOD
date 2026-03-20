@@ -352,7 +352,8 @@ def load_coco_annotations(anno_file, category_name):
 
     return category_bboxes
 
-#检查bbox是否在图片内，如果不在，平移移动bbox位置至随机的图片内，如果bbox在图片内，则返回原bbox
+# Check if bbox is within image bounds. If not, translate bbox to a random position within the image.
+# If bbox is within bounds, return original bbox.
 def check_bbox_in_image(bbox, image_width, image_height):
     xmin, ymin, width, height = bbox
     xmax = xmin + width
@@ -561,7 +562,7 @@ if __name__ == "__main__":
 
             img_save_path = args.output+"/VOC2007/JPEGImages/"
             os.makedirs(img_save_path, exist_ok=True)
-            #保存图片和相应的标注文件
+            # Save images and corresponding annotation files
             for sample in image_sample:
                 img_name = domain + '_' + str(img_id) + '.png'
                 sample.save(os.path.join(img_save_path, img_name))

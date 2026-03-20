@@ -419,7 +419,7 @@ class Tag2Text(nn.Module):
                 if insert_input != None:
                     tag_input[0]=tag_input[0] + ' | ' + ' | '.join(insert_input)
 
-        #box_caption由list转换成str，并将‘，’替换成’|”
+        # Convert box_caption from list to str, replace ‘,’ with ‘|’
         tag_input = [' | '.join([' | '.join(item.split(', ')) for item in tag_input])]
         tag_output = tag_input
 

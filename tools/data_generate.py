@@ -1,4 +1,5 @@
-# 用于生成数据集的脚本，输入源域数据集图片和标签、需要生成的目标域，输出目标域数据集图片和标签
+# Script for generating datasets. Input: source domain images and labels, target domain to generate.
+# Output: target domain images and labels with consistent annotations.
 import argparse
 import numpy as np
 import random
@@ -34,8 +35,8 @@ from utils.model import create_clip_pretrain_model, set_alpha_scale, alpha_gener
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# 1. 定义目标域属性词典，一共5个域，daytimeclear、duskrainy、nightsunny、nightrainy、daytimefoggy,
-# 每个目标域属性对应一个字典，包含attribute、weather、time、scene和7个name类别：car、person、bicycle、motorcycle、truck、bus、train
+# 1. Define target domain attribute dictionary. Contains 5 domains: daytimeclear, duskrainy, nightsunny, nightrainy, daytimefoggy.
+# Each domain has attributes including: attribute, weather, time, scene and 7 object categories: car, person, bicycle, motorcycle, truck, bus, train
 domain_pre_prompt = {
     "daytimeclear": "a cityscape photo of a street during daytime",
     "duskrainy": "a cityscape photo of a rainy street during dusk",
@@ -128,9 +129,9 @@ device = "cuda"
 
 
 
-# 根据目标域、attribute_dict、类别，返回组合的属性列表
+# Return combined attribute list based on target domain, attribute_dict, and category
 def get_region_list(target_domain, category, weather, scene, time):
-    #object从列表bbox_attribute_dict[category]中随机选择一个
+    # Randomly select an object from bbox_attribute_dict[category] list
     object = random.choice(bbox_attribute_dict[category]["object"])
     action = random.choice(bbox_attribute_dict[category]["action"])
     # weather = random.choice(domian_attribute_dict[target_domain]["weather"])
@@ -144,15 +145,15 @@ def get_region_list(target_domain, category, weather, scene, time):
         region_prompt = "A " + object + " is " + action + " in a " + weather + " " + scene + " during " + time + "."
     return attribute_list, region_prompt
 
-# 2. 读取源域数据集图片和标签，生成目标域数据集图片和标签
+# 2. Read source domain dataset images and labels, generate target domain dataset images and labels
 
-#函数。读取coco数据集的json格式标签文件
+# Function: Read COCO format JSON annotation file
 def read_coco_json(json_path):
     with open(json_path, 'r') as f:
         data = json.load(f)
     return data
 
-# 函数。读取源域数据集图片和标签
+# Function: Read source domain dataset images and labels
 def read_coco_data(image_dir, json_path):
     data = read_coco_json(json_path)
     images = data['images']
@@ -165,7 +166,7 @@ def read_coco_data(image_dir, json_path):
             image_id_to_annotations[image_id] = []
         image_id_to_annotations[image_id].append(annotation)
 
-## 函数。根据json标注返回image_id_to_annotations
+## Function: Return image_id_to_annotations mapping from JSON annotations
 def get_image_id_to_annotations(json_path):
     data = read_coco_json(json_path)
     images = data['images']
@@ -182,28 +183,28 @@ def get_image_id_to_annotations(json_path):
 
 
 def filter_captions(target_domain, prompt, captions, key_words):
-    # 计算prompt的特征向量
+    # Calculate feature vector for prompt
     vectorizer = CountVectorizer().fit([prompt])
     prompt_vector = vectorizer.transform([prompt])
 
     filtered_captions = []
-    # 遍历每个caption
+    # Iterate through each caption
     for caption in captions:
-        # 计算caption的特征向量
+        # Calculate feature vector for caption
         caption_vector = vectorizer.transform([caption])
 
-        # 计算caption与prompt之间的相似度（余弦相似度）
+        # Calculate similarity between caption and prompt (cosine similarity)
         similarity = cosine_similarity(prompt_vector, caption_vector)[0][0]
 
-        # 检查caption是否包含所有必须的关键词汇之一
+        # Check if caption contains any of the required keywords
         contains_key_words = any(keyword in caption.lower() for keyword in key_words)
         # contains_key_words = all(keyword in caption.lower() for keyword in key_words)
 
-        # 如果相似度高于阈值且包含必须的关键词汇，则将其保留
+        # Keep caption if similarity exceeds threshold and contains required keywords
         if similarity > 0.6 and contains_key_words:
             filtered_captions.append((caption, similarity))
 
-    # 根据相似度对captions进行排序
+    # Sort captions by similarity score
     if len(filtered_captions) > 1:
         filtered_captions.sort(key=lambda x: x[1], reverse=True)
         return [caption[0] for caption in filtered_captions][0]
@@ -483,7 +484,7 @@ def run_generate_image(meta, model, autoencoder, text_encoder, diffusion, clip_m
         # img_name = str(int(image_id)) + '.png'
         img_name = filename
         sample = torch.clamp(sample, min=-1, max=1) * 0.5 + 0.5
-        #如果sample的requires_grad是True，则改成False
+        # Detach sample if requires_grad is True
         if sample.requires_grad:
             sample = sample.detach()
         sample = sample.cpu().numpy().transpose(1, 2, 0) * 255
@@ -494,9 +495,9 @@ def run_generate_image(meta, model, autoencoder, text_encoder, diffusion, clip_m
             refined_image.save(
                 os.path.join(output_folder, img_name.replace('.png', '_xl_s{}_n{}.png'.format(strength, steps))))
 
-        # 将完整的图片路径拆分为文件夹路径和文件名
+        # Split full image path into folder path and filename
         img_folder, img_filename = os.path.split(img_name)
-        # 检查并创建嵌套目录
+        # Check and create nested directories
         if not os.path.exists(os.path.join(output_folder, img_folder)):
             os.makedirs(os.path.join(output_folder, img_folder), exist_ok=True)
 
@@ -526,7 +527,7 @@ def generate_data(source_image_dir, source_json_path, target_domain, model, auto
     specified_tags = 'None'
 
 
-    #对每张图片输入tag2text模型，得到每张图片的image caption
+    # Process each image through Tag2Text model to get image caption
     for images_data in tqdm(images):
 
         image_id = images_data['id']
@@ -535,9 +536,9 @@ def generate_data(source_image_dir, source_json_path, target_domain, model, auto
         width = images_data['width']
         image = transform(Image.open(image_path)).unsqueeze(0).to(device)
 
-        # "annos"包含image_id_to_annotations[image_id]里每个标注的"bbox"、"mask"、"category_name"、"caption"
+        # "annos" contains "bbox", "mask", "category_name", "caption" for each annotation in image_id_to_annotations[image_id]
         ann = []
-        #判断image_id_to_annotations是否有image_id，有则遍历image_id_to_annotations[image_id]
+        # Check if image_id exists in image_id_to_annotations, iterate if present
         if image_id not in image_id_to_annotations:
             continue
         if len(image_id_to_annotations[image_id])> max_bbox_num:
@@ -552,13 +553,13 @@ def generate_data(source_image_dir, source_json_path, target_domain, model, auto
         image_caption = res[2]
         image_caption = filter_captions(target_domain, res[1].replace(' | ', ', '), image_caption, image_tag)
 
-        #当前图片的场景
+        # Current image scene attributes
         weather = random.choice(domian_attribute_dict[target_domain]["weather"])
         scene = random.choice(domian_attribute_dict[target_domain]["scene"])
         time = random.choice(domian_attribute_dict[target_domain]["time"])
 
         for annotation in image_id_to_annotations[image_id]:
-            #bbox为[x_min.y_min,width,height]
+            # bbox format: [x_min, y_min, width, height]
             bbox = annotation['bbox']
             if bbox == [0, 0, 0, 0]:
                 continue
@@ -569,13 +570,13 @@ def generate_data(source_image_dir, source_json_path, target_domain, model, auto
             box_tag_list, box_prompt = get_region_list(target_domain,category_name, weather, scene, time)
 
             if generate_prompt :
-            #使用tag2text模型生成box_caption
+            # Generate box_caption using Tag2Text model
                 region = Image.open(image_path)
                 region = region.crop((bbox[0],bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]))
                 region = transform(region).unsqueeze(0).to(device)
                 box_caption = tagmodel.text_generate(region, tag_input = box_tag_list, sample = True)
             else:
-            #使用模板生成box_caption
+            # Generate box_caption using template
                 box_caption = box_prompt
             # box_caption = tagmodel.generate(region)
 
@@ -587,14 +588,14 @@ def generate_data(source_image_dir, source_json_path, target_domain, model, auto
             })
 
 
-        #构建新的json，作为instansdiffusion的输入，包含“caption”、"width"、"height"、"annos"，
+        # Build new JSON as InstanceDiffusion input, containing “caption”, “width”, “height”, “annos”
         image_input_instdiff = {
             "caption": image_caption,
             "width": width,
             "height": height,
             "annos": ann,
         }
-        #instance_diffusion生成image_data_instdiff的图片
+        # Generate images using InstanceDiffusion
         generate_image(image_input_instdiff, target_domain, images_data['file_name'], model, autoencoder, text_encoder, diffusion, config,clip_model, clip_processor, grounding_tokenizer_input)
         # return image_input_instdiff
 

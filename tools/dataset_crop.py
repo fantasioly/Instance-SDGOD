@@ -53,7 +53,7 @@ def process_img_annotations(imgage, dataset_dir, img_savepath, img_anns):
     # top = random.randint(0, height - min_side) if width == min_side else 0
     # right = left + min_side
     # bottom = top + min_side
-    # 计算居中裁剪的起始位置
+    # Calculate center crop start position
     left = (width - min_side) // 2
     top = (height - min_side) // 2 if width != min_side else 0
     right = left + min_side
@@ -111,4 +111,4 @@ if __name__ == '__main__':
     with open(annotation_savepath, 'w') as f:
         json.dump(dataset, f)
 
-    print("图片和标注处理完成。")
+    print("Image and annotation processing completed.")

@@ -4,7 +4,7 @@ import os
 
 
 def parse_xml(xml_file):
-    # 用于存储各属性和对象统计的字典
+    # Dictionary to store attribute and object statistics
     stats = {
         'weather': defaultdict(int),
         'scene': defaultdict(int),
@@ -16,18 +16,18 @@ def parse_xml(xml_file):
         'trafficLightColor': defaultdict(int)
     }
 
-    # 解析XML文件
+    # Parse XML file
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    # 统计attributes中的weather, scene, timeofday
+    # Count weather, scene, timeofday in attributes
     attributes = root.find('attributes')
     if attributes is not None:
         stats['weather'][attributes.find('weather').text] += 1
         stats['scene'][attributes.find('scene').text] += 1
         stats['timeofday'][attributes.find('timeofday').text] += 1
 
-    # 统计objects
+    # Count objects
     for obj in root.findall('object'):
         stats['object_count'] += 1
         obj_type = obj.find('name').text
@@ -40,7 +40,7 @@ def parse_xml(xml_file):
 
     return stats
 def aggregate_daytimeclear_stats(txt_file, xml_folder):
-    # 总体统计
+    # Overall statistics
     total_stats = {
         'weather': defaultdict(int),
         'scene': defaultdict(int),
@@ -52,13 +52,13 @@ def aggregate_daytimeclear_stats(txt_file, xml_folder):
         'trafficLightColor': defaultdict(int)
     }
 
-    # 读取训练集文件名
+    # Read training set filenames
     with open(txt_file, 'r') as file:
         for line in file:
             xml_file = os.path.join(xml_folder, line.strip() + '.xml')
             stats = parse_xml(xml_file)
 
-            # 累加统计结果
+            # Accumulate statistics
             for key in total_stats:
                 if key in ['weather', 'scene', 'timeofday', 'object_types', 'occluded', 'truncated',
                            'trafficLightColor']:
@@ -73,7 +73,7 @@ def aggregate_daytimeclear_stats(txt_file, xml_folder):
 
 
 def parse_daytimefoggy_xml(xml_file):
-    # 用于存储各属性和对象统计的字典
+    # Dictionary to store attribute and object statistics
     stats = {
         'object_count': 0,
         'object_types': defaultdict(int),
@@ -82,11 +82,11 @@ def parse_daytimefoggy_xml(xml_file):
         'difficult': defaultdict(int),
     }
 
-    # 解析XML文件
+    # Parse XML file
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    # 统计objects
+    # Count objects
     for obj in root.findall('object'):
         stats['object_count'] += 1
         obj_type = obj.find('name').text
@@ -96,7 +96,7 @@ def parse_daytimefoggy_xml(xml_file):
         stats['difficult'][obj.find('difficult').text] += 1
     return stats
 def aggregate_daytimefoggy_stats(txt_file, xml_folder):
-    # 总体统计
+    # Overall statistics
     total_stats = {
         'object_count': 0,
         'object_types': defaultdict(int),
@@ -105,13 +105,13 @@ def aggregate_daytimefoggy_stats(txt_file, xml_folder):
         'difficult': defaultdict(int),
     }
 
-    # 读取训练集文件名
+    # Read training set filenames
     with open(txt_file, 'r') as file:
         for line in file:
             xml_file = os.path.join(xml_folder, line.strip() + '.xml')
             stats = parse_daytimefoggy_xml(xml_file)
 
-            # 累加统计结果
+            # Accumulate statistics
             for key in total_stats:
                 if key in ['object_types', 'pose', 'truncated', 'difficult']:
                     for subkey, count in stats[key].items():
@@ -122,7 +122,7 @@ def aggregate_daytimefoggy_stats(txt_file, xml_folder):
     return total_stats
 
 def parse_duskrainy_xml(xml_file):
-    # 用于存储各属性和对象统计的字典
+    # Dictionary to store attribute and object statistics
     stats = {
         'weather': defaultdict(int),
         'scene': defaultdict(int),
@@ -134,18 +134,18 @@ def parse_duskrainy_xml(xml_file):
         'pose': defaultdict(int)
     }
 
-    # 解析XML文件
+    # Parse XML file
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    # 统计attributes中的weather, scene, timeofday
+    # Count weather, scene, timeofday in attributes
     attributes = root.find('attributes')
     if attributes is not None:
         stats['weather'][attributes.find('weather').text] += 1
         stats['scene'][attributes.find('scene').text] += 1
         stats['timeofday'][attributes.find('timeofday').text] += 1
 
-    # 统计objects
+    # Count objects
     for obj in root.findall('object'):
         stats['object_count'] += 1
         obj_type = obj.find('name').text
@@ -156,7 +156,7 @@ def parse_duskrainy_xml(xml_file):
 
     return stats
 def aggregate_duskrainy_stats(txt_file, xml_folder):
-    # 总体统计
+    # Overall statistics
     total_stats = {
         'weather': defaultdict(int),
         'scene': defaultdict(int),
@@ -168,13 +168,13 @@ def aggregate_duskrainy_stats(txt_file, xml_folder):
         'pose': defaultdict(int)
     }
 
-    # 读取训练集文件名
+    # Read training set filenames
     with open(txt_file, 'r') as file:
         for line in file:
             xml_file = os.path.join(xml_folder, line.strip() + '.xml')
             stats = parse_duskrainy_xml(xml_file)
 
-            # 累加统计结果
+            # Accumulate statistics
             for key in total_stats:
                 if key in ['weather', 'scene', 'timeofday', 'object_types', 'difficult', 'truncated',
                            'pose']:
@@ -188,7 +188,7 @@ def aggregate_duskrainy_stats(txt_file, xml_folder):
     return total_stats
 
 def parse_nightrainy_xml(xml_file):
-    # 用于存储各属性和对象统计的字典
+    # Dictionary to store attribute and object statistics
     stats = {
         'weather': defaultdict(int),
         'scene': defaultdict(int),
@@ -200,18 +200,18 @@ def parse_nightrainy_xml(xml_file):
         'pose': defaultdict(int)
     }
 
-    # 解析XML文件
+    # Parse XML file
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    # 统计attributes中的weather, scene, timeofday
+    # Count weather, scene, timeofday in attributes
     attributes = root.find('attributes')
     if attributes is not None:
         stats['weather'][attributes.find('weather').text] += 1
         stats['scene'][attributes.find('scene').text] += 1
         stats['timeofday'][attributes.find('timeofday').text] += 1
 
-    # 统计objects
+    # Count objects
     for obj in root.findall('object'):
         stats['object_count'] += 1
         obj_type = obj.find('name').text
@@ -222,7 +222,7 @@ def parse_nightrainy_xml(xml_file):
 
     return stats
 def aggregate_nightrainy_stats(txt_file, xml_folder):
-    # 总体统计
+    # Overall statistics
     total_stats = {
         'weather': defaultdict(int),
         'scene': defaultdict(int),
@@ -234,13 +234,13 @@ def aggregate_nightrainy_stats(txt_file, xml_folder):
         'pose': defaultdict(int)
     }
 
-    # 读取训练集文件名
+    # Read training set filenames
     with open(txt_file, 'r') as file:
         for line in file:
             xml_file = os.path.join(xml_folder, line.strip() + '.xml')
             stats = parse_nightrainy_xml(xml_file)
 
-            # 累加统计结果
+            # Accumulate statistics
             for key in total_stats:
                 if key in ['weather', 'scene', 'timeofday', 'object_types', 'difficult', 'truncated',
                            'pose']:
@@ -254,7 +254,7 @@ def aggregate_nightrainy_stats(txt_file, xml_folder):
     return total_stats
 
 
-# 示例使用：
+# Example usage:
 # results = aggregate_daytimeclear_stats('/home/haoli84/code/Datasets/Adverse-Weather/daytime_clear/VOC2007/ImageSets/Main/train.txt',
 #                 '/home/haoli84/code/Datasets/Adverse-Weather/daytime_clear/VOC2007/Annotations')
 

@@ -2,28 +2,28 @@ import os
 import json
 import argparse
 def get_image_paths_and_save_json(directory, output_json_file):
-    # 初始化图片路径字典列表
+    # Initialize list of image path dictionaries
     image_dicts = []
 
-    # 遍历目录及其子目录
+    # Traverse directory and its subdirectories
     for root, dirs, files in os.walk(directory):
         for file in files:
-            # 检查文件是否为图片
+            # Check if file is an image
             if file.endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif')):
-                # 构建完整的图片路径
+                # Build full image path
                 image_path = os.path.join(root, file)
-                # 创建一个字典，包含图片路径和空的caption
+                # Create a dictionary containing image path and empty caption
                 image_dict = {"image": image_path, "caption": ""}
-                # 添加到列表
+                # Add to list
                 image_dicts.append(image_dict)
 
-    # 保存到JSON文件
+    # Save to JSON file
     with open(output_json_file, 'w') as json_file:
         json.dump(image_dicts, json_file, ensure_ascii=False, indent=4)
 
-# 示例用法
-# directory = '/cpfs/user/haoli84/code/Datasets/cityscapes/leftImg8bit'  # 替换为你的目录路径
-# output_json_file = 'image_paths_with_caption.json'  # 输出的JSON文件名
+# Example usage
+# directory = '/cpfs/user/haoli84/code/Datasets/cityscapes/leftImg8bit'  # Replace with your directory path
+# output_json_file = 'image_paths_with_caption.json'  # Output JSON file name
 # get_image_paths_and_save_json(directory, output_json_file)
 
 if __name__ == "__main__":

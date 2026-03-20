@@ -3,49 +3,49 @@ from collections import defaultdict, Counter
 
 
 def get_least_common_categories_indices(json_file, n=4):
-    # 读取JSON文件
+    # Read JSON file
     with open(json_file, 'r') as f:
         data = json.load(f)
 
-    # 初始化类别计数字典
+    # Initialize category count dictionary
     category_count = Counter()
-    # 初始化类别对应图片索引的字典
+    # Initialize dictionary mapping categories to image indices
     category_indices = defaultdict(set)
 
-    # 提取类别ID与名称的映射
+    # Extract category ID to name mapping
     categories = {category['id']: category['name'] for category in data['categories']}
 
-    # 创建图片ID到索引的映射
+    # Create image ID to index mapping
     image_id_to_index = {image['id']: idx for idx, image in enumerate(data['images'])}
 
-    # 遍历所有注释，统计每个类别的数量并记录图片索引
+    # Iterate through all annotations, count each category and record image indices
     for annotation in data['annotations']:
         category_id = annotation['category_id']
         image_id = annotation['image_id']
         category_count[category_id] += 1
         category_indices[category_id].add(image_id_to_index[image_id])
 
-    # 找出数量最少的6个类别
+    # Find the n least common categories
     least_common_categories = category_count.most_common()[:-n - 1:-1]
 
-    # 获取最少6个类别的图片索引列表并取并集
+    # Get union of image indices for the n least common categories
     index_union = set()
     for category_id, count in least_common_categories:
         index_union.update(category_indices[category_id])
     index_union = sorted(index_union)
 
-    # 初始化图片索引对应的所有注释
+    # Initialize annotations for each image index
     image_annotations = defaultdict(list)
     for annotation in data['annotations']:
         image_annotations[image_id_to_index[annotation['image_id']]].append(annotation)
 
-    # 统计这些图片所包含每种类别的总标注数量
+    # Count combined category annotations for these images
     combined_category_count = Counter()
     for index in index_union:
         for annotation in image_annotations[index]:
             combined_category_count[annotation['category_id']] += 1
 
-    # 打印结果
+    # Print results
     print(f"Union of Image Indices: {list(index_union)}")
     print("Combined Category Counts:")
     for category_id, count in combined_category_count.items():
@@ -53,32 +53,32 @@ def get_least_common_categories_indices(json_file, n=4):
 
 
 def count_categories(json_file):
-    # 读取JSON文件
+    # Read JSON file
     with open(json_file, 'r') as f:
         data = json.load(f)
 
-    # 初始化类别计数字典
+    # Initialize category count dictionary
     category_count = defaultdict(int)
 
-    # 提取类别ID与名称的映射
+    # Extract category ID to name mapping
     categories = {category['id']: category['name'] for category in data['categories']}
 
-    # 遍历所有注释，统计每个类别的数量
+    # Iterate through all annotations and count each category
     for annotation in data['annotations']:
         category_id = annotation['category_id']
         category_count[category_id] += 1
 
-    # 打印每个类别的数量
+    # Print count for each category
     for category_id, count in category_count.items():
         print(f"Category: {categories[category_id]}, Count: {count}")
 
 if __name__ == '__main__':
-    # 使用示例
+    # Usage example
     json_file0 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytime_clear/voc07_train.json'
     json_file1 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytime_clear_crop/voc07_train_crop.json'
     json_file2 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/generated_v3/daytimeclear/voc07_train_crop_filter.json'
     json_file3 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/generated_v3/daytimeclear/voc07_train_crop_filter_cmmd.json'
-    # 替换为你的COCO JSON标注文件路径
+    # Replace with your COCO JSON annotation file path
     # count_categories(json_file0)
     # print("===========================================================================================================")
     # count_categories(json_file1)

@@ -1,5 +1,6 @@
-#1.读取coco标注格式的json文件，读取图片文件夹，根据图片名称，删除掉json中没有的图片
-#2.遍历每张图片，遍历该图片的标注信息，提取标注的每个box，计算区域ccmd的值，如果ccmd大于阈值，则删除该box
+# 1. Read COCO format JSON annotation file and image folder, remove images not in JSON based on image names
+# 2. Iterate through each image and its annotations, extract each bounding box, calculate CMMD value for the region,
+#    and remove the box if CMMD exceeds threshold
 
 import json
 import os
@@ -40,7 +41,7 @@ def _center_crop_and_resize(im, size):
       return im.resize((size, size), resample=Image.BICUBIC)
 
 def _resize_bicubic(images, size):
-#如果images的维度是3，name在第0轴添加一个维度表示是batch
+# If images has 3 dimensions, add a batch dimension at axis 0
     if len(images.shape) == 3:
       images = np.expand_dims(images, axis=0)
     images = torch.from_numpy(images.transpose(0, 3, 1, 2))
@@ -115,26 +116,26 @@ def compute_cmmd_img(ref, eval):
     return val
 
 def filter_coco_annotation_by_images(coco_annotation_file, images_folder, output_annotation_file):
-      # 读取COCO标注文件
+      # Read COCO annotation file
       with open(coco_annotation_file, 'r') as f:
             coco_data = json.load(f)
 
-      # 获取图片文件夹中的图片文件名列表
+      # Get list of image filenames in the image folder
       image_files = ['VOC2007/JPEGImages/'.lower() + f.lower() for f in os.listdir(images_folder) if os.path.isfile(os.path.join(images_folder, f))]
 
-      # 筛选出存在于图片文件夹中的图片的标注信息
+      # Filter annotations for images that exist in the image folder
       filtered_images = set(img['file_name'] for img in coco_data['images'] if img['file_name'].lower() in image_files)
-      #构建image id和filtered_images映射
+      # Build mapping from image id to filtered_images
       image_id_to_name = {img['id']: img['file_name'] if img['file_name'] in filtered_images else None for img in coco_data['images']}
 
-      #图片缩放因子为实际图片的宽度除以标注文件中的宽度，取整
+      # Image scale factor: actual image width divided by annotation file width, rounded
       scale_factor = 512/720
 
-      # 构建新的标注信息列表
+      # Build new annotation list
       new_annotations = []
       for annotation in tqdm(coco_data['annotations']):
             if annotation['image_id'] in image_id_to_name and image_id_to_name[annotation['image_id']] is not None:
-                  #提取源域图像区域和目标域图像区域
+                  # Extract source domain image region and target domain image region
                   # if annotation['id']<85:
                   #     continue
 
@@ -150,47 +151,47 @@ def filter_coco_annotation_by_images(coco_annotation_file, images_folder, output
                   #       continue
 
 
-                  #更新bbox
+                  # Update bbox
                   annotation['bbox'] = [int(b * scale_factor) for b in annotation['bbox']]
                   new_annotations.append(annotation)
-      # 更新COCO数据中的annotations部分
+      # Update annotations section in COCO data
       coco_data['annotations'] = new_annotations
 
-      # 移除不存在于图片文件夹中的图片信息
+      # Remove image info for images not in the image folder
       coco_data['images'] = [img for img in coco_data['images'] if img['file_name'] in filtered_images]
-      #更新coco_data['images']中的height和width
+      # Update height and width in coco_data['images']
       for img in coco_data['images']:
             img['height'] = 512
             img['width'] = 512
 
-      # 保存新的标注文件
+      # Save new annotation file
       with open(output_annotation_file, 'w') as f:
             json.dump(coco_data, f, indent=4)
 
 
-# 使用示例
+# Usage example
 target_img_crop_path = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimeclear/'
 
 source_img_crop_path = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytime_clear_centercrop/'
-coco_annotation_file = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytime_clear_centercrop/voc07_train_centercrop.json'  # COCO标注文件路径
+coco_annotation_file = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytime_clear_centercrop/voc07_train_centercrop.json'  # COCO annotation file path
 
-images_folder0 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimeclear/VOC2007/JPEGImages'  # 图片文件夹路径
-output_annotation_file0 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimeclear/voc07_train_centercrop.json'  # 输出标注文件保存路径
+images_folder0 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimeclear/VOC2007/JPEGImages'  # Image folder path
+output_annotation_file0 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimeclear/voc07_train_centercrop.json'  # Output annotation file path
 
 
-images_folder1 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimefoggy/VOC2007/JPEGImages'  # 图片文件夹路径
-output_annotation_file1 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimefoggy/voc07_train_centercrop.json'  # 输出标注文件保存路径
+images_folder1 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimefoggy/VOC2007/JPEGImages'  # Image folder path
+output_annotation_file1 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/daytimefoggy/voc07_train_centercrop.json'  # Output annotation file path
 
-images_folder2 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/duskrainy/VOC2007/JPEGImages'  # 图片文件夹路径
-output_annotation_file2 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/duskrainy/voc07_train_centercrop.json'  # 输出标注文件保存路径
+images_folder2 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/duskrainy/VOC2007/JPEGImages'  # Image folder path
+output_annotation_file2 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/duskrainy/voc07_train_centercrop.json'  # Output annotation file path
 
-images_folder3 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightrainy/VOC2007/JPEGImages'  # 图片文件夹路径
-output_annotation_file3 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightrainy/voc07_train_centercrop.json'  # 输出标注文件保存路径
+images_folder3 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightrainy/VOC2007/JPEGImages'  # Image folder path
+output_annotation_file3 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightrainy/voc07_train_centercrop.json'  # Output annotation file path
 
-images_folder4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightsunny/VOC2007/JPEGImages'  # 图片文件夹路径
-output_annotation_file4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightsunny/voc07_train_centercrop.json'  # 输出标注文件保存路径
+images_folder4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightsunny/VOC2007/JPEGImages'  # Image folder path
+output_annotation_file4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/daytimeclear_instdiff/nightsunny/voc07_train_centercrop.json'  # Output annotation file path
 
-# images_folder4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/rare_classes_generation/VOC2007/JPEGImages'  # 图片文件夹路径
+# images_folder4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/rare_classes_generation/VOC2007/JPEGImages'  # Image folder path
 # output_annotation_file4 = '/cpfs/user/haoli84/code/Datasets/Adverse-Weather/rare_classes_generation//train.json'
 
 
