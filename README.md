@@ -212,22 +212,6 @@ python tools/data_generate.py \
     --output_dir outputs/pseudo_target
 ```
 
-### CSN Module
-
-> **Note**: The CSN (Cross-Style Normalization) module for feature-level augmentation is described in the paper but not included in this repository. This repository focuses on the PTDG image generation component.
-
-## 📈 Benchmarks
-
-GoDiff achieves state-of-the-art performance on autonomous driving benchmarks:
-
-| Method | Daytime-Clear | Night-Clear | Daytime-Rainy | Night-Rainy | Average |
-|--------|---------------|-------------|---------------|-------------|---------|
-| Baseline | 45.2 | 38.1 | 35.6 | 29.8 | 37.2 |
-| C-Gap | 47.8 | 41.2 | 38.9 | 33.1 | 40.3 |
-| **GoDiff (Ours)** | **52.1** | **45.6** | **43.2** | **37.8** | **44.7** |
-
-*Results on Cityscapes → Foggy Cityscapes / Rainy Cityscapes benchmark (mAP @ 0.5)*
-
 ## 📁 Input JSON Format for Inference
 
 ```json
